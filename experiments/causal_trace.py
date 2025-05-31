@@ -472,7 +472,7 @@ class ModelAndTokenizer:
         self.layer_names = [
             n
             for n, m in model.named_modules()
-            if (re.match(r"^(transformer|gpt_neox)\.(h|layers)\.\d+$", n))
+            if (re.match(r"^(transformer|gpt_neox|model)\.(h|layers)\.\d+$", n))
         ]
         self.num_layers = len(self.layer_names)
 
@@ -485,16 +485,22 @@ class ModelAndTokenizer:
 
 
 def layername(model, num, kind=None):
-    if hasattr(model, "transformer"):
-        if kind == "embed":
-            return "transformer.wte"
-        return f'transformer.h.{num}{"" if kind is None else "." + kind}'
-    if hasattr(model, "gpt_neox"):
-        if kind == "embed":
-            return "gpt_neox.embed_in"
-        if kind == "attn":
-            kind = "attention"
-        return f'gpt_neox.layers.{num}{"" if kind is None else "." + kind}'
+    # if hasattr(model, "transformer"):
+    #     if kind == "embed":
+    #         return "transformer.wte"
+    #     return f'transformer.h.{num}{"" if kind is None else "." + kind}'
+    # if hasattr(model, "gpt_neox"):
+    #     if kind == "embed":
+    #         return "gpt_neox.embed_in"
+    #     if kind == "attn":
+    #         kind = "attention"
+    #     return f'gpt_neox.layers.{num}{"" if kind is None else "." + kind}'
+    # else:
+    if kind == "embed":
+        return "model.embed_tokens"
+    if kind == "attn":
+        return f'model.layers.{num}.self_attn'
+    return f'model.layers.{num}{"" if kind is None else "." + kind}'
     assert False, "unknown transformer structure"
 
 
