@@ -1,5 +1,6 @@
 import argparse
 import json
+from math import exp
 import os
 import re
 from collections import defaultdict
@@ -47,6 +48,7 @@ def main():
             "gpt2-large",
             "gpt2-medium",
             "gpt2",
+            "Qwen/Qwen2.5-0.5B-Instruct"
         ],
     )
     aa("--fact_file", default=None)
@@ -72,7 +74,7 @@ def main():
         knowns = KnownsDataset(DATA_DIR)
     else:
         with open(args.fact_file) as f:
-            knowns = json.load(f)
+            knowns = json.load(f)[:10]
 
     noise_level = args.noise_level
     uniform_noise = False
@@ -106,7 +108,7 @@ def main():
                     mt,
                     knowledge["prompt"],
                     knowledge["subject"],
-                    expect=knowledge["attribute"],
+                    #expect=knowledge["attribute"],
                     kind=kind,
                     noise=noise_level,
                     uniform_noise=uniform_noise,
@@ -125,8 +127,8 @@ def main():
             plot_result = dict(numpy_result)
             plot_result["kind"] = kind
             pdfname = f'{pdf_dir}/{str(numpy_result["answer"]).strip()}_{known_id}{kind_suffix}.pdf'
-            if known_id > 200:
-                continue
+            #if known_id > 200:
+            #    continue
             plot_trace_heatmap(plot_result, savepdf=pdfname)
 
 
