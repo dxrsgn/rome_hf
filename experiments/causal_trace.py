@@ -48,7 +48,7 @@ def main():
             "gpt2-large",
             "gpt2-medium",
             "gpt2",
-            "Qwen/Qwen2.5-0.5B-Instruct"
+            "Qwen/Qwen2.5-7B-Instruct"
         ],
     )
     aa("--fact_file", default=None)
@@ -74,7 +74,7 @@ def main():
         knowns = KnownsDataset(DATA_DIR)
     else:
         with open(args.fact_file) as f:
-            knowns = json.load(f)[:10]
+            knowns = json.load(f)
 
     noise_level = args.noise_level
     uniform_noise = False
@@ -100,7 +100,7 @@ def main():
 
     for knowledge in tqdm(knowns):
         known_id = knowledge["known_id"]
-        for kind in None, "mlp", "attn":
+        for kind in ["mlp"]:# None, "mlp", "attn":
             kind_suffix = f"_{kind}" if kind else ""
             filename = f"{result_dir}/knowledge_{known_id}{kind_suffix}.npz"
             if not os.path.isfile(filename):
@@ -552,7 +552,7 @@ def plot_trace_heatmap(result, savepdf=None, title=None, xlabel=None, modelname=
     for i in range(*result["subject_range"]):
         labels[i] = labels[i] + "*"
 
-    with plt.rc_context(rc={"font.family": "Times New Roman"}):
+    with plt.rc_context():
         fig, ax = plt.subplots(figsize=(3.5, 2), dpi=200)
         h = ax.pcolor(
             differences,
@@ -623,6 +623,7 @@ def decode_tokens(tokenizer, token_array):
 def find_token_range(tokenizer, token_array, substring):
     toks = decode_tokens(tokenizer, token_array)
     whole_string = "".join(toks)
+    #print(whole_string, substring)
     char_loc = whole_string.index(substring)
     loc = 0
     tok_start, tok_end = None, None
